@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="viewport" content="width=device-width, initial-scale=1" />
+<title>edit-schema</title>
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="andy" />
+<script type="text/javascript" src="http://js.gomein.net.cn/gmlib/jq/1.7.1/jquery.js"></script>
+<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style type="text/css">
+*{padding: 0;margin: 0;list-style: none;}
+.testdiv{margin: 20px auto; width: 900px;height: 100px;border: 1px solid #ccc;text-align:center;line-height: 100px;}
+._testul{margin: 20px auto;display: block;background: #ccc;border: dashed 1px green;width: 900px;height: 632px;text-align: center;}
+._testul li{width: 290px;height: 200px;border: 1px dashed #eee;float: left;margin: 2px 4px;}
+.sele, .testTip, .save{position:absolute;}
+._im{ border: 1px dashed red !important;}
+.save{
+    width: 55px;
+    height: 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+    line-height: 20px;
+    text-decoration: none;
+    color: #1B1D1D;
+    border: 1px solid #000;
+}
+</style>
+<body>
+  <select  class="edit-schema" name="callback" id="callback"> 
+      <option value="">1----------------------</option>
+      <option value="">2----------------------</option>
+      <option value="">3----------------------</option>
+  </select>    
+
+    <div class="testdiv edit-schema">
+      <h1>edit-schema</h1>
+      <h2></h2>
+    </div>
+    <ul class="_testul">
+      <li class="edit-schema">1</li>
+      <li class="edit-schema">2</li>
+      <li class="edit-schema">3</li>
+      <li class="edit-schema">4</li>
+      <li class="edit-schema">5</li>
+      <li class="edit-schema">6</li>
+      <li class="edit-schema">7</li>
+      <li class="edit-schema">8</li>
+      <li class="edit-schema">9</li>
+    </ul>
+
+
+    <br>
+
+    <div class="dropdown">
+      <button type="button" class="btn dropdown-toggle" id="dropdownMenu1" 
+          data-toggle="dropdown">
+        主题
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+        <li role="presentation">
+          <a role="menuitem" tabindex="-1" href="#">Java</a>
+        </li>
+        <li role="presentation">
+          <a role="menuitem" tabindex="-1" href="#">数据挖掘</a>
+        </li>
+        <li role="presentation">
+          <a role="menuitem" tabindex="-1" href="#">数据通信/网络</a>
+        </li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation">
+          <a role="menuitem" tabindex="-1" href="#">分离的链接</a>
+        </li>
+      </ul>
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+;(function($){
+    var $editNodes = $(".edit-schema");
+    var $tip = $("<textarea class='testTip' id='testTip'  rows=10 cols=37></textarea>");
+    var $textarea = $("#testTip");
+    var $sele =$(".sele");
+    var SAVE = $('<a id="save" class="save" href="#">保存</a>');
+    //下拉列表
+    var $sele =$('<select id="sele" name="sele" class="sele">'+
+                 '<option value="data-x=xx">data-x=xx</option>'+
+                 '<option value="a=b">a=b</option>'+
+                 '<option value="c=d">c=d</option>'+
+                 '</select>');
+    function eachNodes(){
+        $editNodes.each(function(i){
+            var $im = $(this);
+                $im.on("click",function(e){
+                  $editNodes.removeClass("_im");
+                  $im.addClass("_im");
+                  $(document.body).append($sele);
+                  $tip.val($im.outerHTML());//显示被点击父级的HTML
+                  $(document.body).append($tip);
+                  $(document.body).append(SAVE);
+                  //位置设置
+                  var $imTop  =$im.offset().top;
+                  var $imLeft = $im.offset().left;
+                  $sele.css({
+                    "top":$imTop,
+                    "left":$imLeft
+                  });
+                  $tip.css({
+                    "top":$imTop+20,
+                    "left":$imLeft
+                  });
+                  SAVE.css({
+                     top: $imTop+136,
+                     left:$imLeft+199
+                  });
+                  //设置选中属性到当前节点上 截取字符串
+                  $im.attr("x",$sele.val());
+                });
+              
+            
+        });
+    };
+
+    //下拉列表值change
+    $sele.change(function(){
+        var im = $("._im")
+        im.attr("x",$sele.val());
+        $tip.val(im.outerHTML());//重新赋值
+    });
+    //保存
+    $("#save").on("click",function(){
+        $tip.val(im.outerHTML());//重新赋值
+    });
+    //init
+    eachNodes();
+    //获取包含自身HTML
+    jQuery.fn.outerHTML = function(s) {
+      return (s) ? this.before(s).remove() : $("<Hill_man>").append(this.eq(0).clone()).html();
+    };
+    
+
+
+})(jQuery);
+</script>
