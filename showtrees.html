@@ -1,0 +1,922 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="viewport" content="width=device-width, initial-scale=1" />
+<title>front-server</title>
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="andy" />
+<link rel="stylesheet" href="ztree_js_css/metroStyle.css" type="text/css">
+<script type="text/javascript" src="http://js.gomein.net.cn/gmlib/jq/1.7.1/jquery.js"></script>
+<script type="text/javascript" src="ztree_js_css/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="ztree_js_css/jquery.ztree.exedit.js"></script>
+<script type="text/javascript" src="ztree_js_css/jquery.ztree.excheck.js"></script><!--这个可不用-->
+<style type="text/css">
+ .showtree{
+      width: 200px;
+      height: 200px;
+      background: #ccc;
+      float:left;
+      border: 1px solid #999;
+      margin: 0px 20px 70px 20px;
+      position: relative;
+
+ }
+.showtips{
+  width: 100px;
+  height: 100px;
+  background: #fff;
+  border: 1px solid #666;
+  position: absolute;
+  left: 0;
+  top: 0;
+/*   display: none; */
+}
+.test{margin:20px;display:block;width:200px;background:#F5F5F5;border:1px solid green;}
+.ztree{
+  position: absolute;
+  left: 72px;
+  top: 0px;
+  background: #ccc;
+  opacity: 0.9;
+}
+</style>
+<script type="text/javascript">
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+
+</script>
+</head>
+<body>
+<!--showtree-->
+<div style="height:1000px;width:1000px; position:relative;">
+    <div>
+      <b  class="test">
+          
+          <div>div父
+            <p>p</p>
+            <span>span</span>
+            <h2>h2</h2>
+            <h3>h3</h3>
+            <p>p</p>
+          </div>
+       <!--    <textarea class="testTip">
+       </textarea> -->
+           <!--ztree-->
+           
+      </b>
+
+<ul id="treeDemo" class="ztree"></ul>
+
+
+
+     <!--  <p class="showtree"> <textarea class="showtips"></textarea></p> -->
+    </div>  
+
+  <!--   <div>
+    <p class="showtree">showtree<textarea class="showtips">show</textarea></p>
+  </div>  -->
+    <!--隐藏域-->
+    <input class="oldText" type="hidden" value="$('.testTip').val();" />
+</div>
+
+<!--ztree-->
+
+
+<!--showtree-->
+<script type="text/javascript">
+//Y2 showTree  先以单个为例处理，在改为批处理
+~function(exports){
+    var doc=$(document);
+    var __={util:"placeholder"};
+    var thisParent=$(".test").parent();//显示节点数
+    var tipsVal=thisParent.html();//html
+
+    //数据
+    var treeJson={
+        "this_key":""
+        ,"parent_key":tipsVal
+        ,"pre_key":""
+        ,"next_key":""
+    };
+    function alternation(){
+      //获取DOM树数据
+      doc.on("click",function(e){
+        $(e.target).attr("class","bindShowTree");//被点击元素加标识
+        var setting = {
+               view: {
+                   removeHoverDom: removeHoverDom,
+                   selectedMulti: false
+               },
+               check: {
+                   enable: true
+               },
+               data: {
+                   simpleData: {
+                       enable: true
+                   }
+               },
+               edit: {
+                   enable: true
+               }
+           };
+          var zNodes =[
+                    { id:1, pId:0, name:"父节点1", open:true},
+                    { id:11, pId:1, name:"父节点11"}
+            
+                 
+                ];
+          console.log($(this).children());
+          //var tipsVal=thisParent.html();
+          //if(event.target==this){
+            //是否有子节点 只取一级 二级
+                /* parentNodeHtml ==   "div (父)
+                        <p>p</p>
+                        <span>span</span>
+                        <h2>h2</h2>
+                        <h3>h3</h3>
+                        <p>p</p>
+                      "*/
+            var parentNode=$(".bindShowTree").children();
+            var parentNodeCd=parentNode.children();
+            //var parentNodeHtml=$(this).children().eq(0).html();
+            var c0 = parentNode.eq(0)[0].outerHTML;
+            var c1 = parentNode.eq(1)[0].outerHTML;
+            var c2 = parentNode.eq(2)[0].outerHTML;
+            var c3 = parentNode.eq(3)[0].outerHTML;
+            if($(".bindShowTree").children().length>0){
+                 var zNodes = concat(
+                                zNodes,
+                                [ 
+                                    { id:2, pId:0, name:"div 需截取", open:true},//父节点
+                                    { id:21, pId:2, name:c0},//平级子节点
+                                    { id:21, pId:2, name:c1},//平级子节点
+                                    { id:21, pId:2, name:c2},//平级子节点
+                                    { id:21, pId:2, name:c3},//平级子节点
+
+                                ]
+                 );
+                  var tree=$.fn.zTree.init($("#treeDemo"), setting, zNodes);
+                  //更新节点数据
+                  var treeObj = $.fn.zTree.getZTreeObj("#treeDemo");
+                  /*var nodes = treeObj.getNodes();
+                  if (nodes.length>0) {debugger;
+                    nodes[0].name = "test";
+                    console.log(nodes[0]);
+                    treeObj.updateNode(nodes[0],false);
+                  }*/
+
+            }else{
+              return
+            }
+            
+
+
+
+            //get elem
+             $(".testTip").val(tipsVal);
+         // }  
+
+      });
+      //值比对保存
+      doc.find(".testTip").on("blur",function(){
+          var oldText=$(".oldText").val();
+          var newText=$(".testTip").val();
+          if(oldText===newText){return}else{
+             //save change
+             console.log(newText);//最新被修改后的值
+          }
+
+      });
+      //写入数据 (不用转换，直接写入数据)
+      var newTreeJson = assoc("parent_key11",111,treeJson);
+      
+      //ztree  call
+      var setting = {
+             view: {
+                 removeHoverDom: removeHoverDom,
+                 selectedMulti: false
+             },
+             check: {
+                 enable: true
+             },
+             data: {
+                 simpleData: {
+                     enable: true
+                 }
+             },
+             edit: {
+                 enable: true
+             }
+         };
+
+         /*var zNodes =[
+                   { id:1, pId:0, name:tipsVal, open:true},
+                   { id:11, pId:1, name:"父节点11"} 
+               ];*/
+
+         $(document).ready(function(){
+            /* $.fn.zTree.init($("#treeDemo"), setting, zNodes);*/
+         });
+         function removeHoverDom(treeId, treeNode) {
+             $("#addBtn_"+treeNode.tId).unbind().remove();
+         };
+        //ztree  call
+    };
+    
+    //基础操作
+    function toArray(o){
+      var a=[];
+      for(var i=0;i<o.length;i++)a.push(o[i]);
+      return a;
+    };
+    //[a] → [a] → [a]  String → String → String
+    var concat=curry(function _concat(set1,set2){
+      set1 = set1 || [];
+      set2 = set2 || [];
+      var idx;
+      var len1 = set1.length;
+      var len2 = set2.length;
+      var result = [];
+
+      idx = -1;
+      while (++idx < len1) {
+      result[result.length] = set1[idx];
+      }
+      idx = -1;
+      while (++idx < len2) {
+      result[result.length] = set2[idx];
+      }
+      return result;
+    });
+    var ifn = curry(function _ifn(test,truefn,falsfn){
+      return function(a){
+        if(test(a))return truefn(a);
+        else return falsfn(a);
+      }
+    });
+    var eq =curry(function _eq(a,b){
+      return a===b;
+    });
+    function always(a){
+      return function(){
+        return a;
+      }
+    }
+    var assoc=curry(function _assoc(prop, val, obj) {
+      if (eq(obj[prop], val)) {
+        return obj;
+      }
+      var result = ifn(is(Array),always([]),always({}))(obj);
+      for (var p in obj) {
+        result[p] = obj[p];
+      }
+      result[prop] = val;
+      return result;
+    });
+    var is = curry(function _is(Ctor, val) {
+      return val != null && val.constructor === Ctor || val instanceof Ctor;
+    });
+
+
+    function pipe(){
+      var args=arguments;
+      var args1=[];
+      return function(){
+        var newargs=toArray(arguments);
+        var first ={diqye:"first"};
+        return reduce(function(acc,a){
+          return a.apply(null,acc===first?newargs:[acc]);
+        },first,args);
+      }
+    };
+    var reduce=curry(function _reduce(fn,start,list){
+      var r=start;
+      for(var i=0;i<list.length;i++){
+        r=fn(r,list[i]);
+      }
+      return r;
+    });
+      function arity(n,fn){
+        switch (n) {
+            case 0: return function() {return fn.apply(this, arguments);};
+            case 1: return function(a0) {void a0; return fn.apply(this, arguments);};
+            case 2: return function(a0, a1) {void a1; return fn.apply(this, arguments);};
+            case 3: return function(a0, a1, a2) {void a2; return fn.apply(this, arguments);};
+            case 4: return function(a0, a1, a2, a3) {void a3; return fn.apply(this, arguments);};
+            case 5: return function(a0, a1, a2, a3, a4) {void a4; return fn.apply(this, arguments);};
+            case 6: return function(a0, a1, a2, a3, a4, a5) {void a5; return fn.apply(this, arguments);};
+            case 7: return function(a0, a1, a2, a3, a4, a5, a6) {void a6; return fn.apply(this, arguments);};
+            case 8: return function(a0, a1, a2, a3, a4, a5, a6, a7) {void a7; return fn.apply(this, arguments);};
+            case 9: return function(a0, a1, a2, a3, a4, a5, a6, a7, a8) {void a8; return fn.apply(this, arguments);};
+            case 10: return function(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9) {void a9; return fn.apply(this, arguments);};
+            default: throw new Error('First argument to arity must be a non-negative integer no greater than ten');
+          }
+      }
+      function curryN(length,fn){
+        return arity(length, function() {
+            var n = arguments.length;
+            var shortfall = length - n;
+            var idx = n;
+            while (--idx >= 0) {
+              if (arguments[idx] === __) {
+                shortfall += 1;
+              }
+            }
+            if (shortfall <= 0) {
+              return fn.apply(this, arguments);
+            } else {
+              var initialArgs = toArray(arguments);
+              return curryN(shortfall, function() {
+                var currentArgs = toArray(arguments);
+                var combinedArgs = [];
+                var idx = -1;
+                while (++idx < n) {
+                  var val = initialArgs[idx];
+                  combinedArgs[idx] = (val === __ ? currentArgs.shift() : val);
+                }
+                return fn.apply(this, combinedArgs.concat(currentArgs));//重新组装参数
+              });
+            }
+          });
+      }
+      function curry(fn){
+        return curryN(fn.length,fn);
+      };
+      //init
+      alternation();
+    //扩展暂时可不用
+    exports.showTree={
+        pipe:pipe
+        ,reduce:reduce
+        ,assoc:assoc
+        ,eq:eq
+        ,always:always
+        ,ifn:ifn
+        ,curry:curry
+    }
+}(this);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// x1  pass
+
+    function hoverUp(div){
+      var timer=null;
+      return function(div2,fn){
+        div.hover(function(){
+          clearTimeout(timer);
+          div2.show();
+          if(fn)fn();
+        },function(){
+          timer=setTimeout(function(){
+            div2.hide();
+          },500);
+        })
+      }
+    };
+    //var doc=$("document");
+    //$(".showtree").each(function(){
+      // jq(hoverUpBySelector(__,".showtree"));
+
+        var selector=$(this);
+        var tips= $(this).next(".showtips");
+        var domTree = selector.html();
+       //console.log(domTree);
+        //tips.text(selector.html()+"1232134");
+        //hoverUp(selector)(tips);
+       // $(this).click(function(){debugger;tips.html("12313123");
+     //})  
+   // });
+
+  /*  div(im).find("[g-hoverup-tip]").each(ui.jq(function(el){
+      var tip=el.attr("g-hoverup-tip");
+      var selector="[g-hover-tip="+tip+"]";
+      ui.hoverUp(el.add(selector))(div(im).find(selector));
+    }));*/
+
+
+/*    var __={util:"placeholder"};
+    function jq(fn){
+      return function(){
+        var div=$(this);                                             
+        fn(div);
+      }
+    }
+    function hoverUpBySelector(div,selector){
+      hoverUpBy(div,function(div){return $(selector)});
+    };
+    function hoverUpBy(div,fn){
+      hoverUp(div)(fn(div));
+    };*/
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--other-->
+<div id="content">
+<h1 class="title">front-server</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgheadline2">1. 描述</a>
+<ul>
+<li><a href="#orgheadline1">1.1. 功能</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline4">2. 初始化</a>
+<ul>
+<li><a href="#orgheadline3">2.1. 推荐用法</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline8">3. 配置文件</a>
+<ul>
+<li><a href="#orgheadline5">3.1. g-cart-server.json</a></li>
+<li><a href="#orgheadline6">3.2. config 说明</a></li>
+<li><a href="#orgheadline7">3.3. project.routes 说明</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgheadline2" class="outline-2">
+<h2 id="orgheadline2"><span class="section-number-2">1</span> 描述</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+基于 node 的前端服务器
+</p>
+</div>
+<div id="outline-container-orgheadline1" class="outline-3">
+<h3 id="orgheadline1"><span class="section-number-3">1.1</span> 功能</h3>
+<div class="outline-text-3" id="text-1-1">
+<ul class="org-ul">
+<li>支持 window osx linux</li>
+<li>java 渲染 jsp</li>
+<li>java 渲染 freemark</li>
+<li>多种形式 url=&gt;json 映射</li>
+<li>支持 js css url 合并</li>
+<li>接口映射到服务器-todo</li>
+<li>内嵌模版可打包到前端 js 不需要引入模版引擎源码</li>
+<li>sprite 支持</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-orgheadline4" class="outline-2">
+<h2 id="orgheadline4"><span class="section-number-2">2</span> 初始化</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-orgheadline3" class="outline-3">
+<h3 id="orgheadline3"><span class="section-number-3">2.1</span> 推荐用法</h3>
+<div class="outline-text-3" id="text-2-1">
+<ul class="org-ul">
+<li>win上</li>
+</ul>
+<div class="org-src-container">
+
+<pre class="src src-sh">git clone https://git.oschina.net/diqye/g-cart-server.git C:\gm\g-cart-server
+<span style="color: #1f71ab;">cd</span> your-project
+&#37197;&#32622;&#25991;&#20214; &#21487;&#20174;c:\gm\g-cart-server&#37324;&#22797;&#21046;g-cart-server.json&#21040;&#26412;&#30446;&#24405;&#25913;&#20889;
+node c:\gm\g-cart-server\server.js
+ 
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+</pre>
+</div>
+<ul class="org-ul">
+<li>osx or linux上</li>
+</ul>
+<div class="org-src-container">
+
+<pre class="src src-sh">git clone https://git.oschina.net/diqye/g-cart-server.git ~\gm\g-cart-server
+chmod <span style="color: #a45bad;">777</span> ~/gm/g-cart-server/lib/xxxxxx/start.sh
+<span style="color: #1f71ab;">cd</span> your-project
+&#37197;&#32622;&#25991;&#20214; &#21487;&#20174;~\gm\g-cart-server&#37324;&#22797;&#21046;g-cart-server.json&#21040;&#26412;&#30446;&#24405;&#25913;&#20889;
+node ~\gm\g-cart-server\server.js
+ 
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgheadline8" class="outline-2">
+<h2 id="orgheadline8"><span class="section-number-2">3</span> 配置文件</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-orgheadline5" class="outline-3">
+<h3 id="orgheadline5"><span class="section-number-3">3.1</span> g-cart-server.json</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+
+<pre class="src src-javascript"><span style="color: #2f96dc;">{</span>
+    <span style="color: #2d9574;">"jettry"</span>: <span style="color: #bc6ec5;">{</span>
+        <span style="color: #2d9574;">"root"</span>: <span style="color: #2d9574;">"E:/workspaces/front-cart"</span>,
+        <span style="color: #2d9574;">"port"</span>: <span style="color: #a45bad;">7776</span>
+    <span style="color: #bc6ec5;">}</span>,
+    <span style="color: #2d9574;">"node"</span>: <span style="color: #bc6ec5;">{</span>
+        <span style="color: #2d9574;">"port"</span>: <span style="color: #a45bad;">8080</span>
+    <span style="color: #bc6ec5;">}</span>,
+    <span style="color: #2d9574;">"statics"</span>: <span style="color: #bc6ec5;">[</span>
+        <span style="color: #2d9574;">"E:/workspaces/dev/Storefront/storedocroot.war"</span>
+    <span style="color: #bc6ec5;">]</span>,
+    <span style="color: #2d9574;">"project"</span>: <span style="color: #bc6ec5;">{</span>
+        <span style="color: #2d9574;">"request"</span>: <span style="color: #2d9574;">[</span>
+            <span style="color: #2d9574;">"/request.json"</span>
+        <span style="color: #2d9574;">]</span>,
+        <span style="color: #2d9574;">"routes"</span>: <span style="color: #2d9574;">[</span>
+          <span style="color: #2d9574;">"./routes/cart-routes.json"</span>,
+          <span style="color: #2d9574;">"./routes/order-success.json"</span>,
+          <span style="color: #2d9574;">"./routes/shopping-routes.json"</span>,
+            <span style="color: #67b11d;">[</span>
+                <span style="color: #2d9574;">"/help"</span>,
+                <span style="color: #2d9574;">"{cwd}/help/help.html"</span>
+            <span style="color: #67b11d;">]</span>,<span style="color: #67b11d;">[</span>
+                <span style="color: #2d9574;">"/"</span>,
+                <span style="color: #2d9574;">"{config.jettry.root}/README.html"</span>
+            <span style="color: #67b11d;">]</span>,<span style="color: #67b11d;">[</span>
+                <span style="color: #2d9574;">"/:site/:page"</span>,
+                <span style="color: #2d9574;">"/{params.site}/{params.page}.ftl"</span>,
+                <span style="color: #2d9574;">"/data/{params.site}/{params.page}.json"</span>
+            <span style="color: #67b11d;">]</span>,<span style="color: #67b11d;">[</span>
+                <span style="color: #2d9574;">"/icon"</span>,
+                <span style="color: #2d9574;">"{config.statics.0}/xxx/1.0.0/html/icons/index.html"</span>
+            <span style="color: #67b11d;">]</span>,<span style="color: #67b11d;">[</span>
+                <span style="color: #2d9574;">"/api/:type/:method"</span>,
+                <span style="color: #2d9574;">"/data/{params.type}/{params.method}.json"</span>
+            <span style="color: #67b11d;">]</span>
+        <span style="color: #2d9574;">]</span>,
+        <span style="color: #2d9574;">"tplTofn"</span>:<span style="color: #2d9574;">{</span>
+            <span style="color: #2d9574;">"src"</span>:<span style="color: #2d9574;">"{config.statics.0}/xxx/1.0.0/template"</span>,
+            <span style="color: #2d9574;">"dist"</span>:<span style="color: #2d9574;">"{config.statics.0}/xxx/1.0.0/templatefn"</span>,
+            <span style="color: #2d9574;">"/cart.js"</span>:<span style="color: #67b11d;">[</span>
+                <span style="color: #2d9574;">"/common.tpl"</span>,
+                <span style="color: #2d9574;">"/cart"</span>
+            <span style="color: #67b11d;">]</span>
+        <span style="color: #2d9574;">}</span>,
+        <span style="color: #2d9574;">"sprite"</span>:<span style="color: #2d9574;">{</span>
+            <span style="color: #2d9574;">"src"</span>:<span style="color: #2d9574;">"{config.statics.0}/xxx/1.0.0/css/i/sprite"</span>,
+            <span style="color: #2d9574;">"dist"</span>:<span style="color: #2d9574;">"{config.statics.0}/xxx/1.0.0/css/i/sprite.png"</span>,
+            <span style="color: #2d9574;">"selector"</span>:<span style="color: #2d9574;">".c-i"</span>,
+             <span style="color: #2d9574;">"html"</span>:<span style="color: #2d9574;">"{config.statics.0}/xxx/1.0.0/html/icons/index.html"</span>,
+            <span style="color: #2d9574;">"css"</span>:<span style="color: #2d9574;">"{config.statics.0}/xxx/1.0.0/css/i/sprite.css"</span>
+        <span style="color: #2d9574;">}</span>
+    <span style="color: #bc6ec5;">}</span>
+<span style="color: #2f96dc;">}</span>
+ 
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgheadline6" class="outline-3">
+<h3 id="orgheadline6"><span class="section-number-3">3.2</span> config 说明</h3>
+<div class="outline-text-3" id="text-3-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">path</th>
+<th scope="col" class="org-left">desc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">jettry.root</td>
+<td class="org-left">jsp root path</td>
+</tr>
+
+<tr>
+<td class="org-left">project.statics</td>
+<td class="org-left">js css image path</td>
+</tr>
+
+<tr>
+<td class="org-left">project.request</td>
+<td class="org-left">jsp or freemark request data</td>
+</tr>
+
+<tr>
+<td class="org-left">project.routes</td>
+<td class="org-left">route mapping</td>
+</tr>
+
+<tr>
+<td class="org-left">project.sprite</td>
+<td class="org-left">auto sprite</td>
+</tr>
+
+<tr>
+<td class="org-left">project.tplTofn</td>
+<td class="org-left">auto tpl</td>
+</tr>
+</tbody>
+</table>
+<p>
+配置文件默认是在当前目录 可以分离出来 但需要自己写脚本 node xxxxx/server.js 放到分离的目录
+</p>
+</div>
+</div>
+<div id="outline-container-orgheadline7" class="outline-3">
+<h3 id="orgheadline7"><span class="section-number-3">3.3</span> project.routes 说明</h3>
+<div class="outline-text-3" id="text-3-3">
+<ol class="org-ol">
+<li>routes 中可以引入另外文件的 routes 路径以~.~开头（当前 config.json 的路径)</li>
+<li>配置的路由规则相同 先进入前面的路由 如果文件未找到会接着往下走 直到 404</li>
+<li><p>
+peoject.routes 中可以引用的变量
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">name</th>
+<th scope="col" class="org-left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>cwd</code></td>
+<td class="org-left">server 运行的目录</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>config</code></td>
+<td class="org-left">config.json 文件数据结构</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>params</code></td>
+<td class="org-left">url 中的匹配项</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>query</code></td>
+<td class="org-left">querystirng</td>
+</tr>
+</tbody>
+</table></li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: 秦振龙</p>
+<p class="date">Created: 2015-11-27 Fri 08:07</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+
+</html>
+<style type="text/css">
+    .title  { text-align: center;
+               margin-bottom: .2em; }
+    .subtitle { text-align: center;
+                font-size: medium;
+                font-weight: bold;
+                margin-top:0; }
+    .todo   { font-family: monospace; color: red; }
+    .done   { font-family: monospace; color: green; }
+    .priority { font-family: monospace; color: orange; }
+    .tag    { background-color: #eee; font-family: monospace;
+              padding: 2px; font-size: 80%; font-weight: normal; }
+    .timestamp { color: #bebebe; }
+    .timestamp-kwd { color: #5f9ea0; }
+    .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+    .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+    .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+    .underline { text-decoration: underline; }
+    #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+    p.verse { margin-left: 3%; }
+    pre {
+      border: 1px solid #ccc;
+      box-shadow: 3px 3px 3px #eee;
+      padding: 8pt;
+      font-family: monospace;
+      overflow: auto;
+      margin: 1.2em;
+    }
+    pre.src {
+      position: relative;
+      overflow: visible;
+      padding-top: 1.2em;
+    }
+    pre.src:before {
+      display: none;
+      position: absolute;
+      background-color: white;
+      top: -10px;
+      right: 10px;
+      padding: 3px;
+      border: 1px solid black;
+    }
+    pre.src:hover:before { display: inline;}
+    pre.src-sh:before    { content: 'sh'; }
+    pre.src-bash:before  { content: 'sh'; }
+    pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+    pre.src-R:before     { content: 'R'; }
+    pre.src-perl:before  { content: 'Perl'; }
+    pre.src-java:before  { content: 'Java'; }
+    pre.src-sql:before   { content: 'SQL'; }
+
+    table { border-collapse:collapse; }
+    caption.t-above { caption-side: top; }
+    caption.t-bottom { caption-side: bottom; }
+    td, th { vertical-align:top;  }
+    th.org-right  { text-align: center;  }
+    th.org-left   { text-align: center;   }
+    th.org-center { text-align: center; }
+    td.org-right  { text-align: right;  }
+    td.org-left   { text-align: left;   }
+    td.org-center { text-align: center; }
+    dt { font-weight: bold; }
+    .footpara { display: inline; }
+    .footdef  { margin-bottom: 1em; }
+    .figure { padding: 1em; }
+    .figure p { text-align: center; }
+    .inlinetask {
+      padding: 10px;
+      border: 2px solid gray;
+      margin: 10px;
+      background: #ffffcc;
+    }
+    #org-div-home-and-up
+     { text-align: right; font-size: 70%; white-space: nowrap; }
+    textarea { overflow-x: auto; }
+    .linenr { font-size: smaller }
+    .code-highlighted { background-color: #ffff00; }
+    .org-info-js_info-navigation { border-style: none; }
+    #org-info-js_console-label
+      { font-size: 10px; font-weight: bold; white-space: nowrap; }
+    .org-info-js_search-highlight
+      { background-color: #ffff00; color: #000000; font-weight: bold; }
+
+  </style>
+</style>
